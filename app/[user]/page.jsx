@@ -18,7 +18,9 @@ export async function generateMetadata({ params }) {
     title: "New api example",
     description: "This is a new api example",
     other: {
-      ...(await fetchMetadata(new URL("/api/pay", "http://localhost:3000"))),
+      ...(await fetchMetadata(
+        new URL("/api/pay", `${process.env.NEXT_PUBLIC_VERCEL_URL}`)
+      )),
     },
   };
 }

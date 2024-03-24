@@ -4,8 +4,7 @@ import { sanitizeAmount } from "@/components/db/utilities";
 import { getUserDataForFid } from "frames.js";
 import { getAddressesForFid } from "frames.js";
 import { getFrameMessage } from "frames.js/next/server";
-
-const totalPages = 5;
+import { getInfo } from "@/app/[user]/GetInfo";
 
 const frames = createFrames({
   basePath: "/api/pay",
@@ -44,6 +43,11 @@ const handleRequest = frames(async (ctx) => {
 
   // HOME
   if (pageTag === "home") {
+    const info = await getInfo({ user: frameUsername });
+    const profile = info.profile.Wallet;
+
+    console.log("profile is ", profile);
+
     const imageUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL}/frames/home.png`;
     return {
       image: (
@@ -62,7 +66,7 @@ const handleRequest = frames(async (ctx) => {
             // backgroundSize: "100px 100px",
           }}
         >
-          <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+          <div tw="flex flex-col items-center w-full w-48 h-48 overflow-hidden rounded-full">
             {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
             <img
               src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
@@ -78,7 +82,26 @@ const handleRequest = frames(async (ctx) => {
               tw="object-cover bg-transparent z-10"
             />
           </div>
-          <div tw="flex flex-col items-center w-full px-5 text-5xl mt-5">{`@${frameUsername}`}</div>
+          <div tw="flex flex-col items-center w-full px-5 text-3xl mt-5">{`@${frameUsername}`}</div>
+
+          <div tw="text-4xl">{profile.socials[0].profileDisplayName}</div>
+          <div tw="text-3xl">{profile.socials[0].profileBio}</div>
+
+          <div tw="flex flex-row items-center w-full justify-center mt-12">
+            <div tw="flex flex-col items-center w-1/2">
+              <div tw="text-center flex flex-col">Followers</div>
+              <div tw="text-center flex flex-col">
+                {profile.socials[0].followerCount}
+              </div>
+            </div>
+
+            <div tw="flex flex-col items-center w-1/2">
+              <div tw="text-center flex flex-col">Following</div>
+              <div tw="text-center flex flex-col">
+                {profile.socials[0].followingCount}
+              </div>
+            </div>
+          </div>
         </div>
       ),
       buttons: [
@@ -88,7 +111,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "pay", frameUsername, frameUserAddress },
           }}
         >
-          Pay
+          💰 Pay
         </Button>,
         <Button
           action="post"
@@ -96,7 +119,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "request", frameUsername, frameUserAddress },
           }}
         >
-          Request
+          🫴 Request
         </Button>,
       ],
     };
@@ -278,7 +301,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Pay
+            💰 Pay
           </Button>,
           <Button
             action="post"
@@ -313,7 +336,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -373,7 +396,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Confirm
+            💯 Confirm
           </Button>,
           <Button
             action="post"
@@ -381,7 +404,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -460,7 +483,7 @@ const handleRequest = frames(async (ctx) => {
           target={`/txdata?amount=${paymentDetails.amount}&receiverAddress=${paymentDetails.receiver_address}`}
           post_url={`?pageTag=pay-success&frameUsername=${frameUsername}&frameUserAddress=${frameUserAddress}&todo=delete&payeeId=${paymentDetails.id}`}
         >
-          Submit
+          ✅ Submit
         </Button>,
         <Button
           action="post"
@@ -468,7 +491,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "home", frameUsername, frameUserAddress },
           }}
         >
-          Home
+          🏠 Home
         </Button>,
       ],
     };
@@ -530,7 +553,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "pay", frameUsername, frameUserAddress },
           }}
         >
-          Go Back
+          ⬅️ Go Back
         </Button>,
         <Button
           action="tx"
@@ -539,7 +562,7 @@ const handleRequest = frames(async (ctx) => {
           }&receiverAddress=${frameUserAddress}`}
           post_url={`?pageTag=pay-success&frameUsername=${frameUsername}&frameUserAddress=${frameUserAddress}`}
         >
-          Submit
+          ✅ Submit
         </Button>,
         <Button
           action="post"
@@ -547,7 +570,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "home", frameUsername, frameUserAddress },
           }}
         >
-          Home
+          🏠 Home
         </Button>,
       ],
     };
@@ -602,7 +625,7 @@ const handleRequest = frames(async (ctx) => {
             },
           }}
         >
-          Refresh
+          🔄 Refresh
         </Button>,
         <Button
           action="post"
@@ -610,7 +633,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "home", frameUsername, frameUserAddress },
           }}
         >
-          Home
+          🏠 Home
         </Button>,
       ],
     };
@@ -662,7 +685,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Go
+            🚀 Go
           </Button>,
           <Button
             action="post"
@@ -670,7 +693,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -730,7 +753,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Confirm
+            💯 Confirm
           </Button>,
           <Button
             action="post"
@@ -738,7 +761,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -799,7 +822,7 @@ const handleRequest = frames(async (ctx) => {
             },
           }}
         >
-          Confirm
+          💯 Confirm
         </Button>,
         <Button
           action="post"
@@ -807,7 +830,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "home", frameUsername, frameUserAddress },
           }}
         >
-          Home
+          🏠 Home
         </Button>,
       ],
     };
@@ -865,7 +888,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Go Back
+            ⬅️ Go Back
           </Button>,
           <Button
             action="post"
@@ -879,7 +902,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Submit
+            ✅ Submit
           </Button>,
           <Button
             action="post"
@@ -887,7 +910,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -940,10 +963,10 @@ const handleRequest = frames(async (ctx) => {
           <Button
             action="post"
             target={{
-              query: { pageTag: "request", frameUsername, frameUserAddress },
+              query: { pageTag: " ", frameUsername, frameUserAddress },
             }}
           >
-            Go Back
+            ⬅️ Go Back
           </Button>,
           <Button
             action="post"
@@ -956,7 +979,7 @@ const handleRequest = frames(async (ctx) => {
               },
             }}
           >
-            Submit
+            ✅ Submit
           </Button>,
           <Button
             action="post"
@@ -964,7 +987,7 @@ const handleRequest = frames(async (ctx) => {
               query: { pageTag: "home", frameUsername, frameUserAddress },
             }}
           >
-            Home
+            🏠 Home
           </Button>,
         ],
       };
@@ -1050,7 +1073,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "request", frameUsername, frameUserAddress },
           }}
         >
-          Request More
+          📈 Request More
         </Button>,
         <Button
           action="post"
@@ -1058,7 +1081,7 @@ const handleRequest = frames(async (ctx) => {
             query: { pageTag: "home", frameUsername, frameUserAddress },
           }}
         >
-          Home
+          🏠 Home
         </Button>,
       ],
     };

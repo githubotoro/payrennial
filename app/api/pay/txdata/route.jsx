@@ -4,11 +4,14 @@ import { NextResponse } from "next/server";
 export async function POST(req) {
   console.log("frames api called");
 
+  const requestURL = req.url;
+  const searchParams = new URLSearchParams(requestURL.split("?")[1]);
+
+  const amount = searchParams.get("amount");
+  const receiverAddress = searchParams.get("receiverAddress");
+
   const json = await req.json();
-
   const frameMessage = await getFrameMessage(json);
-
-  console.log("frames message is ", frameMessage);
 
   if (!frameMessage) {
     throw new Error("No frame message");
@@ -20,9 +23,9 @@ export async function POST(req) {
     method: "eth_sendTransaction",
     params: {
       abi: [],
-      to: "0x3143542219E33D75B57e08E57BC5848bAEaf4DaA",
+      to: receiverAddress,
       data: "0x",
-      value: "1000000000",
+      value: amount,
     },
   });
 }

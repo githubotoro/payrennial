@@ -14,13 +14,18 @@ import { fetchMetadata } from "frames.js/next";
 export async function generateMetadata({ params }) {
   const user = params.user;
 
+  const farcasterProfileRes = await fetch(
+    `https://api.web3.bio/profile/farcaster/${user}`
+  );
+  const farcasterProfileData = await farcasterProfileRes.json();
+
   return {
     title: "New api example",
     description: "This is a new api example",
     other: {
       ...(await fetchMetadata(
         new URL(
-          `/api/pay?sender_username=${user}`,
+          `/api/pay?frameUsername=${user}&frameUserAddress=${farcasterProfileData.address}`,
           `${process.env.NEXT_PUBLIC_VERCEL_URL}`
         )
       )),
@@ -47,9 +52,19 @@ export default async function Page({ params, searchParams }) {
   // const profile = info.profile.Wallet;
   // const previousFrame = getPreviousFrame(searchParams);
 
+  const farcasterProfileRes = await fetch(
+    `https://api.web3.bio/profile/farcaster/${user}`
+  );
+  const farcasterProfileData = await farcasterProfileRes.json();
+
   const url = currentURL(`/${user}`);
 
-  const initialState = { pageIndex: 0, user: params.user, pageTag: "home" };
+  const initialState = {
+    pageIndex: 0,
+    frameUsername: params.user,
+    frameUserAddress: farcasterProfileData.address,
+    pageTag: "home",
+  };
 
   return (
     <div>

@@ -18,8 +18,8 @@ export async function POST(req) {
   }
 
   return NextResponse.json({
-    chainId: "eip155:10",
-    // chainId: "eip155:11155420",
+    // chainId: "eip155:10",
+    chainId: "eip155:11155420",
     method: "eth_sendTransaction",
     params: {
       abi: [],

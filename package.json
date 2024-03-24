@@ -13,7 +13,8 @@
     "frames.js": "^0.9.5",
     "next": "14.1.4",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "viem": "^2.8.18"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",

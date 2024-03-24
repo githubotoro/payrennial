@@ -18,7 +18,7 @@ export async function POST(req) {
     params: {
       abi: [],
       to: "0x3143542219E33D75B57e08E57BC5848bAEaf4DaA",
-      data: "",
+      data: "0x",
       value: "1000000000",
     },
   });

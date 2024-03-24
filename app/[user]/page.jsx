@@ -74,26 +74,4 @@ export default async function Page({ params, searchParams }) {
       </Link>
     </div>
   );
-
-  return (
-    <FrameContainer
-      postUrl="/api/user"
-      state={initialState}
-      previousFrame={previousFrame}
-      pathname={`/user/${user}`}
-    >
-      <FrameImage aspectRatio="1:1">
-        <div tw="w-full h-full bg-black text-white justify-center items-center">
-          trust me bro
-        </div>
-      </FrameImage>
-
-      <FrameInput text="Enter Username" />
-
-      <FrameButton action="post">Submit</FrameButton>
-      <FrameButton>Pay</FrameButton>
-      <FrameButton>Request</FrameButton>
-      <FrameButton>✨ Get PayCaster</FrameButton>
-    </FrameContainer>
-  );
 }

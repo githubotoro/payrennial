@@ -16,21 +16,16 @@ const handleRequest = frames(async (ctx) => {
   const frameUsername = ctx.searchParams.frameUsername;
   const frameUserAddress = ctx.searchParams.frameUserAddress;
 
-  // console.log("ctx is ", ctx);
-
-  // const query = `
-  //   SELECT
-  //     *
-  //   FROM
-  //     users;
-  // `;
-
-  // const status = await sql.unsafe(query);
-
-  // console.log(status);
-
   let userData = null;
   let userAddress = null;
+  let frameData = null;
+
+  const frameDataRes = await fetch(
+    `https://api.web3.bio/profile/farcaster/${frameUsername}`
+  );
+  frameData = await frameDataRes.json();
+
+  console.log(frameData);
 
   if (pageTag !== "home") {
     userData = await getUserDataForFid({ fid: ctx.message.requesterFid });
@@ -49,10 +44,41 @@ const handleRequest = frames(async (ctx) => {
 
   // HOME
   if (pageTag === "home") {
+    const imageUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL}/frames/home.png`;
     return {
       image: (
-        <div tw="flex flex-col">
-          <div tw="flex">home page</div>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            textAlign: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+            color: "white",
+            // backgroundSize: "100px 100px",
+          }}
+        >
+          <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+            {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+            <img
+              src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+              alt="image"
+              tw="object-cover absolute"
+            />
+
+            <img
+              width={224}
+              height={224}
+              src={frameData.avatar}
+              alt="image"
+              tw="object-cover bg-transparent z-10"
+            />
+          </div>
+          <div tw="flex flex-col items-center w-full px-5 text-5xl mt-5">{`@${frameUsername}`}</div>
         </div>
       ),
       buttons: [
@@ -137,7 +163,12 @@ const handleRequest = frames(async (ctx) => {
         i < list.length && currentIndex < list.length && newlist.length < 5;
         i++
       ) {
-        newlist.push(list[currentIndex]);
+        let item = {
+          ...list[currentIndex],
+          index: currentIndex,
+        };
+
+        newlist.push(item);
         currentIndex += 1;
       }
 
@@ -161,8 +192,78 @@ const handleRequest = frames(async (ctx) => {
 
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">pay page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full px-5 text-3xl">
+              {newlist.map((item, key) => {
+                const amountInEth = item.amount / Math.pow(10, 18);
+                const formattedAmount = new Intl.NumberFormat("en-US", {
+                  maximumFractionDigits: 6,
+                }).format(amountInEth);
+
+                return (
+                  <div
+                    key={key}
+                    tw="flex flex-row border border-white bg-[#d9d9d9] bg-opacity-20 w-full px-5 py-3 rounded-3xl mt-5"
+                  >
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      tw="px-3 w-1/12 flex flex-col"
+                    >
+                      {item.index + 1}
+                    </div>
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      tw="px-3 w-3/12 flex flex-col"
+                    >
+                      @{item.receiver_username}
+                    </div>
+
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      tw="px-3 w-3/12 flex flex-col"
+                    >
+                      {formattedAmount} ETH
+                    </div>
+                    <div
+                      style={{
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      }}
+                      tw="px-3 w-5/12"
+                    >
+                      {item.message}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ),
         textInput: "Enter Payee Id",
@@ -219,11 +320,48 @@ const handleRequest = frames(async (ctx) => {
     } else {
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">pay page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+              <img
+                src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+                alt="image"
+                tw="object-cover absolute"
+              />
+
+              <img
+                width={224}
+                height={224}
+                src={frameData.avatar}
+                alt="image"
+                tw="object-cover w-full h-full bg-transparent z-10"
+              />
+            </div>
+
+            <div
+              style={{
+                wordWrap: "break-word",
+              }}
+              tw="text-5xl mt-12 px-24 max-w-2xl w-full flex flex-col items-center"
+            >
+              {`How much do you wannna pay to @${frameUsername}?`}
+            </div>
           </div>
         ),
-        textInput: "Enter Payment Amount: (OP)",
+        textInput: "Enter Payment Amount: (ETH)",
         buttons: [
           <Button
             action="post"
@@ -272,8 +410,48 @@ const handleRequest = frames(async (ctx) => {
 
     return {
       image: (
-        <div tw="flex flex-col">
-          <div tw="flex">pay same page</div>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            textAlign: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+            color: "white",
+            // backgroundSize: "100px 100px",
+          }}
+        >
+          <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+            {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+            <img
+              src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+              alt="image"
+              tw="object-cover absolute"
+            />
+
+            <img
+              width={224}
+              height={224}
+              src={frameData.avatar}
+              alt="image"
+              tw="object-cover bg-transparent z-10"
+            />
+          </div>
+
+          <div
+            style={{
+              wordWrap: "break-word",
+            }}
+            tw="text-5xl mt-12 px-20 max-w-5xl w-full flex flex-col items-center"
+          >
+            {`You will be paying ${
+              paymentDetails.amount / Math.pow(10, 18)
+            } ETH to @${paymentDetails.receiver_username}.`}
+          </div>
         </div>
       ),
       buttons: [
@@ -302,8 +480,46 @@ const handleRequest = frames(async (ctx) => {
 
     return {
       image: (
-        <div tw="flex flex-col">
-          <div tw="flex">pay message page</div>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            textAlign: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+            color: "white",
+            // backgroundSize: "100px 100px",
+          }}
+        >
+          <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+            {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+            <img
+              src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+              alt="image"
+              tw="object-cover absolute"
+            />
+
+            <img
+              width={224}
+              height={224}
+              src={frameData.avatar}
+              alt="image"
+              tw="object-cover w-full h-full bg-transparent z-10"
+            />
+          </div>
+
+          <div
+            style={{
+              wordWrap: "break-word",
+            }}
+            tw="text-5xl mt-12 px-20 max-w-5xl w-full flex flex-col items-center"
+          >
+            {`Please add a message to describe your payment of ${amount} ETH.`}
+          </div>
         </div>
       ),
       textInput: "Add a Message",
@@ -318,7 +534,9 @@ const handleRequest = frames(async (ctx) => {
         </Button>,
         <Button
           action="tx"
-          target={`/txdata?amount=${amount}&receiverAddress=${frameUserAddress}`}
+          target={`/txdata?amount=${
+            amount * Math.pow(10, 18)
+          }&receiverAddress=${frameUserAddress}`}
           post_url={`?pageTag=pay-success&frameUsername=${frameUsername}&frameUserAddress=${frameUserAddress}`}
         >
           Submit
@@ -403,11 +621,36 @@ const handleRequest = frames(async (ctx) => {
     if (userData.username === frameUsername) {
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">request page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+              {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+              <img
+                src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+                alt="image"
+                tw="object-cover"
+              />
+            </div>
+
+            <div tw="text-5xl mt-12 px-24">
+              You can send a payment request here. Who are you requesting to?
+            </div>
           </div>
         ),
-        textInput: "Enter Payer Username",
+        textInput: "Enter Payer's Farcaster Username",
         buttons: [
           <Button
             action="post"
@@ -434,11 +677,48 @@ const handleRequest = frames(async (ctx) => {
     } else {
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">request page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full relative">
+              <img
+                width={224}
+                height={224}
+                src={frameData.avatar}
+                alt="image"
+                tw="object-cover w-full h-full bg-transparent"
+              />
+
+              <img
+                src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+                alt="image"
+                tw="object-cover absolute"
+              />
+            </div>
+
+            <div
+              style={{
+                wordWrap: "break-word",
+              }}
+              tw="text-5xl mt-12 px-20 max-w-3xl w-full flex flex-col items-center"
+            >
+              {`How much are you requesting from @${frameUsername}?`}
+            </div>
           </div>
         ),
-        textInput: "Enter Request Amount: (OP)",
+        textInput: "Enter Request Amount: (ETH)",
         buttons: [
           <Button
             action="post"
@@ -472,11 +752,41 @@ const handleRequest = frames(async (ctx) => {
 
     return {
       image: (
-        <div tw="flex flex-col">
-          <div tw="flex">request page</div>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            textAlign: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+            color: "white",
+            // backgroundSize: "100px 100px",
+          }}
+        >
+          <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+            {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+            <img
+              src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+              alt="image"
+              tw="object-cover"
+            />
+          </div>
+
+          <div
+            style={{
+              wordWrap: "break-word",
+            }}
+            tw="text-5xl mt-12 px-24 max-w-2xl w-full flex flex-col items-center"
+          >
+            {`How much are you requesting from @${otherUsername}?`}
+          </div>
         </div>
       ),
-      textInput: "Enter Request Amount: (OP)",
+      textInput: "Enter Request Amount: (ETH)",
       buttons: [
         <Button
           action="post"
@@ -508,8 +818,38 @@ const handleRequest = frames(async (ctx) => {
     if (otherUsername) {
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">request message page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+              {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+              <img
+                src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+                alt="image"
+                tw="object-cover"
+              />
+            </div>
+
+            <div
+              style={{
+                wordWrap: "break-word",
+              }}
+              tw="text-5xl mt-12 px-20 max-w-3xl w-full flex flex-col items-center"
+            >
+              {`Please add a message to describe your request of ${amount} ETH.`}
+            </div>
           </div>
         ),
         textInput: "Add a Message",
@@ -554,8 +894,45 @@ const handleRequest = frames(async (ctx) => {
     } else {
       return {
         image: (
-          <div tw="flex flex-col">
-            <div tw="flex">request message page</div>
+          <div
+            style={{
+              height: "100%",
+              width: "100%",
+              display: "flex",
+              textAlign: "center",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              flexWrap: "nowrap",
+              backgroundImage: `linear-gradient(to bottom, #9c60ff, #0a1259)`,
+              color: "white",
+              // backgroundSize: "100px 100px",
+            }}
+          >
+            <div tw="flex flex-col items-center w-full w-56 h-56 overflow-hidden rounded-full">
+              <img
+                width={224}
+                height={224}
+                src={frameData.avatar}
+                alt="image"
+                tw="object-cover w-full h-full bg-transparent"
+              />
+
+              <img
+                src="https://images.rawpixel.com/image_png_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjkzNy1hZXctMTY1LnBuZw.png"
+                alt="image"
+                tw="object-cover absolute"
+              />
+            </div>
+
+            <div
+              style={{
+                wordWrap: "break-word",
+              }}
+              tw="text-5xl mt-12 px-20 max-w-5xl w-full flex flex-col items-center"
+            >
+              {`Please add a message to describe your request of ${amount} ETH.`}
+            </div>
           </div>
         ),
         textInput: "Add a Message",
@@ -610,7 +987,7 @@ const handleRequest = frames(async (ctx) => {
           '${otherUsername}',
           '${userData.username}',
           '${userAddress}',
-          ${amount},
+          ${parseFloat(amount) * Math.pow(10, 18)},
           '${message}'
       );
       `;
@@ -622,7 +999,7 @@ const handleRequest = frames(async (ctx) => {
           '${frameUsername}',
           '${userData.username}',
           '${userAddress}',
-          ${amount},
+          ${parseFloat(amount) * Math.pow(10, 18)},
           '${message}'
       );
       `;
@@ -632,8 +1009,38 @@ const handleRequest = frames(async (ctx) => {
 
     return {
       image: (
-        <div tw="flex flex-col">
-          <div tw="flex">request submitted page</div>
+        <div
+          style={{
+            height: "100%",
+            width: "100%",
+            display: "flex",
+            textAlign: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            flexWrap: "nowrap",
+            backgroundImage: `linear-gradient(to bottom, #00835c, #00835c)`,
+            color: "white",
+            // backgroundSize: "100px 100px",
+          }}
+        >
+          <div tw="flex flex-col items-center w-full w-48 h-48 overflow-hidden rounded-full">
+            {/* <img src={frameData.avatar} alt="image" tw="object-cover" /> */}
+            <img
+              src={`${process.env.NEXT_PUBLIC_VERCEL_URL}/frames/check.jpg`}
+              alt="image"
+              tw="object-cover"
+            />
+          </div>
+
+          <div
+            style={{
+              wordWrap: "break-word",
+            }}
+            tw="text-5xl mt-12 px-20 max-w-3xl w-full flex flex-col items-center"
+          >
+            {`Your request of ${amount} ETH has been submitted to @${frameUsername}.`}
+          </div>
         </div>
       ),
       buttons: [
